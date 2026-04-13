@@ -1,0 +1,58 @@
+# ── Core ─────────────────────────────────────────────────────────────────────
+Django==5.0.6
+django-tenants==3.6.1
+psycopg2-binary==2.9.9
+gunicorn==22.0.0
+
+# ── Auth & security ───────────────────────────────────────────────────────────
+django-allauth==0.63.3          # social/email auth foundation
+argon2-cffi==23.1.0             # password hashing (stronger than PBKDF2)
+
+# ── Async tasks ───────────────────────────────────────────────────────────────
+celery==5.4.0
+django-celery-beat==2.6.0       # periodic tasks stored in DB
+django-celery-results==2.5.1
+kombu==5.3.4
+redis==5.0.6
+django-redis==5.4.0
+
+# ── TOTP ─────────────────────────────────────────────────────────────────────
+pyotp==2.9.0
+qrcode[pil]==7.4.2
+
+# ── Payments ─────────────────────────────────────────────────────────────────
+requests==2.32.3                # Paystack API calls
+
+# ── SMS / notifications ───────────────────────────────────────────────────────
+africastalking==1.2.7
+
+# ── Frontend ─────────────────────────────────────────────────────────────────
+django-htmx==1.17.3
+django-widget-tweaks==1.5.0
+
+# ── Storage ──────────────────────────────────────────────────────────────────
+django-storages[s3]==1.14.3     # S3 / DO Spaces / Cloudflare R2
+boto3==1.34.144
+
+# ── Dev / tooling ─────────────────────────────────────────────────────────────
+python-dotenv==1.0.1
+django-extensions==3.2.3
+django-debug-toolbar==4.4.2
+
+# ── Monitoring ───────────────────────────────────────────────────────────────
+sentry-sdk[django]==2.8.0
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest==8.2.2
+pytest-django==4.8.0
+factory-boy==3.3.0
+faker==26.0.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+Pillow==10.4.0                  # image handling (QR codes)
+phonenumbers==8.13.39           # phone number validation
+django-phonenumber-field==7.3.0
+
+# ── Web3 ──────────────────────────────────────────────────────────────────────
+web3==6.20.1
+eth-account==0.13.4
