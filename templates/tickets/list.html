@@ -1,0 +1,56 @@
+{% extends "base/base.html" %}
+{% block title %}My tickets{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-semibold mb-6">My tickets</h1>
+
+{% if tickets %}
+<div class="space-y-3">
+  {% for ticket in tickets %}
+  <a href="{% url 'tickets:ticket_detail' ticket.id %}"
+     class="block bg-white rounded-xl border border-gray-200 p-5 hover:border-brand transition">
+    <div class="flex items-start justify-between">
+      <div>
+        <div class="font-medium text-gray-900">{{ ticket.event.title }}</div>
+        <div class="text-sm text-gray-500 mt-0.5">
+          {{ ticket.event.kickoff|date:"D j M Y, g:i A" }} · {{ ticket.event.venue }}
+        </div>
+        <div class="text-sm text-gray-500 mt-1">
+          {{ ticket.seat_category|upper }} · Seat #{{ ticket.seat_number }}
+        </div>
+      </div>
+      <span class="text-xs px-2 py-1 rounded-full font-medium
+        {% if ticket.status == 'active' %}bg-green-50 text-green-700
+        {% elif ticket.status == 'pending_payment' %}bg-amber-50 text-amber-700
+        {% elif ticket.status == 'resold' %}bg-blue-50 text-blue-700
+        {% else %}bg-gray-100 text-gray-500{% endif %}">
+        {{ ticket.status|capfirst }}
+      </span>
+    </div>
+
+    <!-- Current TOTP if active -->
+    {% if ticket.status == 'active' or ticket.status == 'resold' %}
+    <div class="mt-4 bg-gray-50 rounded-xl px-4 py-3 flex items-center justify-between">
+      <div>
+        <p class="text-xs text-gray-400 mb-0.5">Gate code</p>
+        <p class="text-2xl font-mono font-bold text-gray-900 tracking-widest">
+          {{ ticket.current_totp }}
+        </p>
+      </div>
+      <div class="text-xs text-gray-400 text-right">
+        Refreshes every<br>30 seconds
+      </div>
+    </div>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-16 text-gray-400">
+  <p class="text-base">No tickets yet.</p>
+  <a href="{% url 'events:index' %}" class="text-brand text-sm mt-2 inline-block hover:underline">
+    Browse events →
+  </a>
+</div>
+{% endif %}
+{% endblock %}

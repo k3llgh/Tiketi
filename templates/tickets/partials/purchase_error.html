@@ -1,0 +1,17 @@
+<!-- Replaces modal on purchase error -->
+<div class="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4">
+  <div class="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6 text-center">
+    <div class="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </div>
+    <h2 class="font-semibold text-gray-900">Unable to complete purchase</h2>
+    <p class="text-gray-500 text-sm mt-2">{{ error }}</p>
+    <button onclick="document.querySelector('.fixed').remove()"
+            class="mt-5 w-full border border-gray-200 py-2.5 rounded-xl text-sm font-medium
+                   text-gray-600 hover:bg-gray-50 transition">
+      Close
+    </button>
+  </div>
+</div>

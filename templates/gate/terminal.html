@@ -1,0 +1,72 @@
+{% extends "base/base.html" %}
+{% block title %}Gate terminal — {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-sm mx-auto">
+
+  <!-- Event header -->
+  <div class="mb-6">
+    <div class="text-xs text-gray-400 mb-1">Gate terminal</div>
+    <h1 class="text-xl font-semibold text-gray-900">{{ event.title }}</h1>
+    <p class="text-sm text-gray-500">{{ event.kickoff|date:"D j M Y, g:i A" }} · {{ event.venue }}</p>
+  </div>
+
+  <!-- Sync health indicator -->
+  <div id="sync-status"
+       hx-get="{% url 'gate:sync' event.id %}?device_id={{ request.GET.device_id|default:'G1' }}"
+       hx-trigger="load, every 300s"
+       hx-swap="innerHTML"
+       class="mb-5 p-3 rounded-xl text-xs font-medium">
+    Checking sync status…
+  </div>
+
+  <!-- TOTP input form -->
+  <div class="bg-white rounded-2xl border border-gray-200 p-6">
+    <label class="block text-xs font-medium text-gray-500 mb-2">Enter 6-digit gate code</label>
+
+    <form hx-post="{% url 'gate:validate' event.id %}"
+          hx-target="#validation-result"
+          hx-swap="innerHTML"
+          hx-on::after-request="this.reset(); document.querySelector('[name=code]').focus()">
+      {% csrf_token %}
+      <input type="hidden" name="gate_id" value="{{ request.GET.gate_id|default:'G1' }}">
+
+      <input type="text"
+             name="code"
+             maxlength="6"
+             pattern="[0-9]{6}"
+             inputmode="numeric"
+             autocomplete="off"
+             autofocus
+             placeholder="000000"
+             class="w-full text-center text-4xl font-mono font-bold tracking-[0.4em]
+                    px-4 py-5 rounded-xl border-2 border-gray-200
+                    focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10
+                    text-gray-900 placeholder-gray-200">
+
+      <button type="submit"
+              class="w-full mt-4 bg-brand text-white py-3 rounded-xl font-medium text-sm
+                     hover:bg-brand-dark transition active:scale-[0.98]">
+        Validate
+      </button>
+    </form>
+  </div>
+
+  <!-- Validation result -->
+  <div id="validation-result" class="mt-4"></div>
+
+  <!-- Force sync button -->
+  <div class="mt-6 text-center">
+    <form hx-post="{% url 'gate:force_sync' event.id %}"
+          hx-target="#sync-status"
+          hx-swap="innerHTML">
+      {% csrf_token %}
+      <input type="hidden" name="device_id" value="{{ request.GET.device_id|default:'G1' }}">
+      <button type="submit" class="text-xs text-gray-400 hover:text-gray-600 underline">
+        Force sync ticket cache
+      </button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

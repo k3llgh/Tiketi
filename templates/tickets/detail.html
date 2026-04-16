@@ -1,0 +1,133 @@
+{% extends "base/base.html" %}
+{% block title %}Ticket — {{ ticket.event.title }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'tickets:ticket_list' %}" class="text-sm text-gray-400 hover:text-gray-600 mb-6 inline-block">
+  ← My tickets
+</a>
+
+<div class="max-w-sm">
+  <!-- Ticket card -->
+  <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+
+    <!-- Header strip -->
+    <div class="bg-brand px-5 py-4">
+      <div class="text-white font-semibold">{{ ticket.event.title }}</div>
+      <div class="text-brand-light text-xs mt-0.5">
+        {{ ticket.event.kickoff|date:"D j M Y, g:i A" }} · {{ ticket.event.venue }}
+      </div>
+    </div>
+
+    <!-- Ticket body -->
+    <div class="px-5 py-5">
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <p class="text-gray-400 text-xs">Category</p>
+          <p class="font-medium text-gray-900 mt-0.5">{{ ticket.seat_category|upper }}</p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-xs">Seat</p>
+          <p class="font-medium text-gray-900 mt-0.5">#{{ ticket.seat_number }}</p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-xs">Type</p>
+          <p class="font-medium text-gray-900 mt-0.5">
+            {{ ticket.ticket_type|capfirst }}{% if ticket.ticket_type == 'group' %} ({{ ticket.group_size }}){% endif %}
+          </p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-xs">Status</p>
+          <p class="font-medium mt-0.5
+            {% if ticket.status == 'active' %}text-green-600
+            {% elif ticket.status == 'pending_payment' %}text-amber-600
+            {% else %}text-gray-500{% endif %}">
+            {{ ticket.status|capfirst }}
+          </p>
+        </div>
+      </div>
+
+      <!-- TOTP gate code -->
+      {% if ticket.status == 'active' or ticket.status == 'resold' %}
+      <div class="mt-5 bg-gray-50 rounded-xl px-4 py-4 text-center border border-dashed border-gray-200">
+        <p class="text-xs text-gray-400 mb-1">Your gate code</p>
+        <p class="text-4xl font-mono font-bold text-gray-900 tracking-[0.3em]"
+           id="totp-code"
+           hx-get="{% url 'tickets:ticket_detail' ticket.id %}#totp-only"
+           hx-trigger="every 30s"
+           hx-swap="outerHTML">
+          {{ ticket.current_totp }}
+        </p>
+        <p class="text-xs text-gray-400 mt-1">Show this to gate staff · refreshes every 30s</p>
+      </div>
+      {% endif %}
+
+      <!-- Pending payment notice -->
+      {% if ticket.status == 'pending_payment' %}
+      <div class="mt-5 bg-amber-50 rounded-xl p-4 text-sm text-amber-700">
+        Payment is being processed. Your gate code will appear here within seconds.
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Dashed divider (ticket tear line) -->
+    <div class="border-t border-dashed border-gray-200 mx-5"></div>
+
+    <!-- Buyback section -->
+    <div class="px-5 py-4">
+      {% if ticket.status == 'active' and ticket.event.buyback_eligible %}
+      <div class="text-sm text-gray-600 mb-3">
+        <p class="font-medium text-gray-900">Can't make it?</p>
+        <p class="text-xs text-gray-500 mt-0.5">
+          Return your {% if ticket.ticket_type == 'group' %}group of {{ ticket.group_size }} tickets{% else %}ticket{% endif %}
+          for a
+          {% if ticket.ticket_type == 'group' %}80%{% else %}90%{% endif %}
+          refund to your wallet.
+        </p>
+      </div>
+      <form method="post"
+            action="{% url 'buyback:request_buyback' ticket.id %}"
+            hx-post="{% url 'buyback:request_buyback' ticket.id %}"
+            hx-confirm="Return {% if ticket.ticket_type == 'group' %}all {{ ticket.group_size }} tickets{% else %}this ticket{% endif %} for a {% if ticket.ticket_type == 'group' %}80%{% else %}90%{% endif %} refund?">
+        {% csrf_token %}
+        <button type="submit"
+                class="w-full border border-gray-200 text-gray-700 py-2.5 rounded-xl text-sm font-medium
+                       hover:border-red-200 hover:text-red-600 hover:bg-red-50 transition">
+          Request buyback
+        </button>
+      </form>
+      {% elif ticket.status == 'active' and not ticket.event.buyback_eligible %}
+      <p class="text-xs text-gray-400 text-center">
+        Buyback available when event sells out.
+      </p>
+      {% elif ticket.status == 'returned' %}
+      <p class="text-xs text-gray-500 text-center">Ticket returned. Refund processing.</p>
+      {% endif %}
+
+      <!-- Postpone opt-out -->
+      {% if ticket.event.status == 'postponed' and ticket.status == 'active' %}
+      <div class="mt-3 pt-3 border-t border-gray-100">
+        <p class="text-xs text-gray-500 mb-2">
+          Event postponed to {{ ticket.event.kickoff|date:"j M Y" }}.
+          Opt-out window closes {{ ticket.event.postpone_opt_out_deadline|date:"j M Y H:i" }} EAT.
+        </p>
+        <form method="post" action="{% url 'tickets:postpone_opt_out' ticket.id %}"
+              hx-post="{% url 'tickets:postpone_opt_out' ticket.id %}"
+              hx-confirm="Get a 100% refund and opt out of the postponed event?">
+          {% csrf_token %}
+          <button type="submit"
+                  class="w-full border border-gray-200 text-gray-700 py-2 rounded-xl text-sm
+                         hover:border-brand hover:text-brand transition">
+            Opt out — full refund
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Price paid -->
+  <p class="text-xs text-gray-400 text-center mt-3">
+    Paid ${% widthratio ticket.price_paid_cents 100 1 %} · Purchased {{ ticket.purchased_at|date:"j M Y" }}
+  </p>
+</div>
+{% endblock %}

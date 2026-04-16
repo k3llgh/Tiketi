@@ -1,0 +1,53 @@
+{% extends "base/base.html" %}
+{% block title %}Wallet{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-semibold mb-6">Wallet</h1>
+
+<!-- Balance card -->
+<div class="bg-brand rounded-2xl p-6 text-white mb-6 max-w-sm">
+  <p class="text-brand-light text-sm">Available balance</p>
+  <p class="text-4xl font-bold mt-1">
+    ${% widthratio wallet.balance_cents 100 1 %}<span class="text-2xl text-brand-light">.{% widthratio wallet.balance_cents 1 100 %}</span>
+  </p>
+  <p class="text-brand-light text-xs mt-2">USD · powered by USDC on Base</p>
+</div>
+
+<!-- Actions -->
+<div class="flex gap-3 mb-8 max-w-sm">
+  <button hx-get="#topup-form" hx-target="#wallet-forms" hx-swap="innerHTML"
+          class="flex-1 bg-white border border-gray-200 rounded-xl py-2.5 text-sm font-medium
+                 text-gray-700 hover:border-brand hover:text-brand transition">
+    Top up
+  </button>
+  <button hx-get="#withdraw-form" hx-target="#wallet-forms" hx-swap="innerHTML"
+          class="flex-1 bg-white border border-gray-200 rounded-xl py-2.5 text-sm font-medium
+                 text-gray-700 hover:border-gray-400 transition">
+    Withdraw
+  </button>
+</div>
+
+<div id="wallet-forms"></div>
+
+<!-- Transaction history -->
+<div class="max-w-xl">
+  <h2 class="text-sm font-medium text-gray-700 mb-3">Recent transactions</h2>
+  {% if transactions %}
+  <div class="space-y-2">
+    {% for tx in transactions %}
+    <div class="bg-white rounded-xl border border-gray-100 px-4 py-3 flex items-center justify-between text-sm">
+      <div>
+        <p class="font-medium text-gray-900">{{ tx.description|truncatechars:48 }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">{{ tx.created_at|date:"j M Y, g:i A" }}</p>
+      </div>
+      <span class="font-semibold {% if tx.amount_cents > 0 %}text-green-600{% else %}text-gray-900{% endif %}">
+        {% if tx.amount_cents > 0 %}+{% endif %}${% widthratio tx.amount_cents|abs 100 1 %}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-sm text-gray-400">No transactions yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

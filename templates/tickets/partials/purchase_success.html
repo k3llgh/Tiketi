@@ -1,0 +1,52 @@
+<!-- Replaces modal after successful purchase -->
+<div class="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4">
+  <div class="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6 text-center">
+
+    <!-- Success icon -->
+    <div class="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+
+    <h2 class="font-semibold text-gray-900 text-lg">You're in!</h2>
+    <p class="text-gray-500 text-sm mt-1">
+      {{ tickets|length }} ticket{{ tickets|length|pluralize }} for {{ event.title }}
+    </p>
+
+    <!-- Ticket details -->
+    {% for ticket in tickets %}
+    <div class="mt-4 bg-gray-50 rounded-xl p-4 text-left">
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-500">Category</span>
+        <span class="font-medium">{{ ticket.seat_category|upper }}</span>
+      </div>
+      <div class="flex justify-between text-sm mt-1.5">
+        <span class="text-gray-500">Seat</span>
+        <span class="font-medium">#{{ ticket.seat_number }}</span>
+      </div>
+      <div class="flex justify-between text-sm mt-1.5">
+        <span class="text-gray-500">Status</span>
+        <span class="text-amber-600 font-medium">
+          {% if ticket.status == "pending_payment" %}Processing…{% else %}Confirmed{% endif %}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+
+    <p class="text-xs text-gray-400 mt-4">
+      Your gate code will arrive via SMS and email within seconds.
+    </p>
+
+    <div class="flex gap-3 mt-5">
+      <a href="{% url 'tickets:ticket_list' %}"
+         class="flex-1 bg-brand text-white py-2.5 rounded-xl text-sm font-medium hover:bg-brand-dark transition">
+        View tickets
+      </a>
+      <button onclick="document.querySelector('.fixed').remove()"
+              class="flex-1 border border-gray-200 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

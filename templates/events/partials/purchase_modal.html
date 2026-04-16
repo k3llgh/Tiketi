@@ -1,0 +1,129 @@
+<!-- Purchase modal — rendered by HTMX into #modal-container -->
+<!-- This is the Polymarket-style overlay: simple, no crypto jargon -->
+
+<div class="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4"
+     id="purchase-modal"
+     x-data="{ qty: 1, category: '{{ categories.0.category }}' }"
+     @keydown.escape.window="document.getElementById('purchase-modal').remove()">
+
+  <div class="bg-white rounded-2xl w-full max-w-sm shadow-xl" @click.stop>
+
+    <!-- Header -->
+    <div class="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100">
+      <div>
+        <div class="font-semibold text-gray-900">{{ event.title }}</div>
+        <div class="text-xs text-gray-400 mt-0.5">{{ event.kickoff|date:"D j M Y" }} · {{ event.venue }}</div>
+      </div>
+      <button onclick="document.getElementById('purchase-modal').remove()"
+              class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100">
+        ✕
+      </button>
+    </div>
+
+    <form method="post"
+          action="{% url 'tickets:purchase' event.id %}"
+          hx-post="{% url 'tickets:purchase' event.id %}"
+          hx-target="#purchase-modal"
+          hx-swap="outerHTML">
+      {% csrf_token %}
+
+      <!-- Click 2: Category -->
+      <div class="px-5 pt-4">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Category</p>
+        <div class="space-y-2">
+          {% for cat in categories %}
+          {% if not cat.is_sold_out %}
+          <label class="flex items-center justify-between p-3 rounded-xl border cursor-pointer
+                         has-[:checked]:border-brand has-[:checked]:bg-brand-light transition">
+            <input type="radio" name="category" value="{{ cat.category }}"
+                   class="sr-only" {% if forloop.first %}checked{% endif %}>
+            <span class="font-medium text-gray-900 text-sm">{{ cat.get_category_display }}</span>
+            <span class="text-sm font-semibold text-gray-900">
+              ${% widthratio cat.gross_price_cents 100 1 %}
+            </span>
+          </label>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Click 2 cont: Quantity (1 or group 2-5) -->
+      <div class="px-5 pt-4">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Tickets</p>
+        <div class="flex gap-2">
+          <label class="flex-1">
+            <input type="radio" name="quantity" value="1" class="sr-only" checked>
+            <div class="text-center py-2 rounded-xl border text-sm font-medium cursor-pointer
+                         peer-checked:border-brand has-[:checked]:border-brand has-[:checked]:bg-brand-light
+                         border-gray-200 hover:border-gray-300 transition">
+              1
+            </div>
+          </label>
+          {% for qty in group_sizes %}
+          <label class="flex-1">
+            <input type="radio" name="quantity" value="{{ qty }}" class="sr-only">
+            <div class="text-center py-2 rounded-xl border text-sm font-medium cursor-pointer
+                         has-[:checked]:border-brand has-[:checked]:bg-brand-light
+                         border-gray-200 hover:border-gray-300 transition">
+              {{ qty }}
+            </div>
+          </label>
+          {% endfor %}
+        </div>
+        <p class="text-xs text-gray-400 mt-1.5">Group tickets — all-or-nothing buyback policy</p>
+      </div>
+
+      <!-- Random seat notice -->
+      <div class="px-5 pt-3">
+        <p class="text-xs text-gray-400">
+          Seat assigned automatically within selected category.
+        </p>
+      </div>
+
+      <!-- Click 3: Pay method -->
+      <div class="px-5 pt-4">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Pay with</p>
+        <div class="flex gap-2">
+          <label class="flex-1">
+            <input type="radio" name="pay_method" value="wallet" class="sr-only" checked>
+            <div class="text-center py-2.5 rounded-xl border text-sm font-medium cursor-pointer
+                         has-[:checked]:border-brand has-[:checked]:bg-brand-light
+                         border-gray-200 hover:border-gray-300 transition">
+              Wallet
+            </div>
+          </label>
+          <label class="flex-1">
+            <input type="radio" name="pay_method" value="mpesa" class="sr-only">
+            <div class="text-center py-2.5 rounded-xl border text-sm font-medium cursor-pointer
+                         has-[:checked]:border-brand has-[:checked]:bg-brand-light
+                         border-gray-200 hover:border-gray-300 transition">
+              M-Pesa
+            </div>
+          </label>
+          <label class="flex-1">
+            <input type="radio" name="pay_method" value="card" class="sr-only">
+            <div class="text-center py-2.5 rounded-xl border text-sm font-medium cursor-pointer
+                         has-[:checked]:border-brand has-[:checked]:bg-brand-light
+                         border-gray-200 hover:border-gray-300 transition">
+              Card
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Click 4: Confirm -->
+      <div class="px-5 pt-5 pb-5">
+        <button type="submit"
+                class="w-full bg-brand text-white py-3 rounded-xl font-medium text-sm
+                       hover:bg-brand-dark transition active:scale-[0.98]
+                       htmx-indicator:opacity-50">
+          Confirm purchase
+        </button>
+        <p class="text-center text-xs text-gray-400 mt-2">
+          TOTP code sent via SMS + email after confirmation
+        </p>
+      </div>
+    </form>
+
+  </div>
+</div>

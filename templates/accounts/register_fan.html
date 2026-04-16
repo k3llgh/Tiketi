@@ -1,0 +1,63 @@
+{% extends "base/base.html" %}
+{% block title %}Create account{% endblock %}
+
+{% block content %}
+<div class="max-w-sm mx-auto">
+  <div class="text-center mb-8">
+    <div class="text-3xl font-bold text-brand mb-1">Tiketi</div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-200 p-6">
+    <h1 class="text-lg font-semibold text-gray-900 mb-5">Create account</h1>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">First name</label>
+            <input type="text" name="first_name"
+                   class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Last name</label>
+            <input type="text" name="last_name"
+                   class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Email <span class="text-gray-400">(optional if using phone)</span></label>
+          <input type="email" name="email" autocomplete="email"
+                 class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Phone <span class="text-gray-400">(optional if using email)</span></label>
+          <input type="tel" name="phone" placeholder="+254700000000"
+                 class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Password</label>
+          <input type="password" name="password" autocomplete="new-password" required
+                 class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+        </div>
+      </div>
+
+      <button type="submit"
+              class="w-full mt-5 bg-brand text-white py-2.5 rounded-xl text-sm font-medium
+                     hover:bg-brand-dark transition">
+        Create account
+      </button>
+    </form>
+  </div>
+
+  <p class="text-center mt-4 text-sm text-gray-500">
+    Already have an account?
+    <a href="{% url 'accounts:login' %}" class="text-brand hover:underline">Sign in →</a>
+  </p>
+</div>
+{% endblock %}

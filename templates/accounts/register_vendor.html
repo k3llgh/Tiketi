@@ -1,0 +1,94 @@
+{% extends "base/base.html" %}
+{% block title %}Become a vendor{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto">
+  <div class="mb-8">
+    <h1 class="text-2xl font-semibold text-gray-900">Become a Tiketi vendor</h1>
+    <p class="text-gray-500 mt-1 text-sm">Sell tickets for your event. Stake a refundable deposit to activate your account.</p>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-200 p-6">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Organisation / venue name</label>
+          <input type="text" name="vendor_name" required
+                 class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Email</label>
+            <input type="email" name="email" required autocomplete="email"
+                   class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Phone</label>
+            <input type="tel" name="phone" placeholder="+254700000000" required
+                   class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Password</label>
+          <input type="password" name="password" required autocomplete="new-password"
+                 class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand">
+        </div>
+
+        <!-- Tier selection -->
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-2">Account tier</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="relative cursor-pointer">
+              <input type="radio" name="tier" value="small" class="sr-only" checked>
+              <div class="p-4 rounded-xl border-2 border-gray-200 has-[:checked]:border-brand
+                           has-[:checked]:bg-brand-light transition">
+                <div class="font-semibold text-gray-900 text-sm">Small</div>
+                <div class="text-xs text-gray-500 mt-1">Up to 1,000 tickets/event</div>
+                <div class="text-brand font-bold mt-2">$110 stake</div>
+                <div class="text-xs text-gray-400">Instant activation</div>
+              </div>
+            </label>
+            <label class="relative cursor-pointer">
+              <input type="radio" name="tier" value="big" class="sr-only">
+              <div class="p-4 rounded-xl border-2 border-gray-200 has-[:checked]:border-accent
+                           has-[:checked]:bg-accent-light transition">
+                <div class="font-semibold text-gray-900 text-sm">Big</div>
+                <div class="text-xs text-gray-500 mt-1">Unlimited tickets/event</div>
+                <div class="text-accent font-bold mt-2">$220 stake</div>
+                <div class="text-xs text-gray-400">24h admin review</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Stake explanation -->
+        <div class="bg-gray-50 rounded-xl p-4 text-xs text-gray-500 leading-relaxed">
+          <span class="font-medium text-gray-700">About the stake deposit:</span>
+          Your stake is refundable in full after a clean 30-day exit. It is not a subscription fee —
+          it is skin in the game. A 15% penalty applies only if you cancel an event you created.
+          Force majeure cancellations (by admin) do not affect your stake.
+        </div>
+      </div>
+
+      <button type="submit"
+              class="w-full mt-6 bg-brand text-white py-3 rounded-xl font-medium text-sm
+                     hover:bg-brand-dark transition">
+        Create vendor account →
+      </button>
+    </form>
+  </div>
+
+  <p class="text-center mt-4 text-sm text-gray-500">
+    Already have an account?
+    <a href="{% url 'accounts:login' %}" class="text-brand hover:underline">Sign in →</a>
+  </p>
+</div>
+{% endblock %}

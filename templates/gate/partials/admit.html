@@ -1,0 +1,17 @@
+<!-- gate/partials/admit.html -->
+<div class="bg-green-50 border border-green-200 rounded-2xl p-5 text-center animate-pulse-once">
+  <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+    </svg>
+  </div>
+  <div class="text-lg font-bold text-green-700">ADMIT</div>
+  {% if ticket %}
+  <div class="text-sm text-green-600 mt-1">
+    {{ ticket.seat_category|upper }} · Seat #{{ ticket.seat_number }}
+  </div>
+  {% if ticket.ticket_type == 'group' %}
+  <div class="text-xs text-green-500 mt-0.5">Group ticket ({{ ticket.group_size }} people)</div>
+  {% endif %}
+  {% endif %}
+</div>

@@ -1,0 +1,80 @@
+{% extends "base/base.html" %}
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+
+  <!-- Back -->
+  <a href="{% url 'events:index' %}" class="text-sm text-gray-400 hover:text-gray-600 mb-6 inline-block">
+    ← All events
+  </a>
+
+  <!-- Header -->
+  {% if event.competition %}
+  <span class="inline-block text-xs font-medium text-brand bg-brand-light px-2 py-0.5 rounded-full mb-3">
+    {{ event.competition }}
+  </span>
+  {% endif %}
+
+  <h1 class="text-2xl font-semibold text-gray-900">{{ event.title }}</h1>
+
+  <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500">
+    <span>{{ event.kickoff|date:"D j M Y, g:i A" }}</span>
+    <span>{{ event.venue }}</span>
+  </div>
+
+  {% if event.description %}
+  <p class="mt-4 text-gray-600 text-sm leading-relaxed">{{ event.description }}</p>
+  {% endif %}
+
+  <!-- Seat categories -->
+  <div class="mt-8">
+    <h2 class="text-sm font-medium text-gray-700 mb-3">Select ticket type</h2>
+    <div class="space-y-3" id="category-cards">
+      {% for cat in categories %}
+      <div class="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between
+                  hover:border-brand cursor-pointer transition
+                  {% if cat.is_sold_out %}opacity-50 cursor-not-allowed{% endif %}"
+           {% if not cat.is_sold_out %}
+           hx-get="{% url 'events:purchase_modal' event.id %}?category={{ cat.category }}"
+           hx-target="#modal-container"
+           hx-swap="innerHTML"
+           {% endif %}>
+
+        <div>
+          <div class="font-medium text-gray-900">{{ cat.get_category_display }}</div>
+          <div class="text-sm text-gray-500 mt-0.5">
+            {% if cat.is_sold_out %}
+              Sold out
+            {% else %}
+              {{ cat.available_seats }} seats available
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="text-right">
+          <div class="font-semibold text-gray-900">
+            ${{ cat.gross_price_cents|divisibleby:100 }}
+          </div>
+          {% if not cat.is_sold_out %}
+          <div class="text-xs text-brand mt-0.5">Tap to select →</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Buyback notice -->
+  {% if event.buyback_eligible %}
+  <div class="mt-6 bg-brand-light rounded-xl p-4 text-sm text-brand-dark">
+    <span class="font-medium">Event sold out.</span>
+    Premium tickets available — returned seats relisted at 10% above original price.
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- Modal container — HTMX injects the purchase modal here -->
+<div id="modal-container"></div>
+{% endblock %}

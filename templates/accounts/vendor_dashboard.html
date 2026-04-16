@@ -1,0 +1,103 @@
+{% extends "base/base.html" %}
+{% block title %}Vendor dashboard{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+    <p class="text-gray-500 text-sm mt-0.5">{{ vendor.vendor_name }}</p>
+  </div>
+  <a href="{% url 'events:create_event' %}"
+     class="bg-brand text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-brand-dark transition">
+    + New event
+  </a>
+</div>
+
+<!-- Vendor status -->
+<div class="bg-white rounded-2xl border border-gray-200 p-5 mb-6 max-w-xl">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-xs text-gray-400 uppercase tracking-wide">Account status</p>
+      <p class="font-semibold text-gray-900 mt-0.5">
+        {{ vendor.get_vendor_status_display }}
+      </p>
+    </div>
+    <span class="text-xs px-3 py-1 rounded-full font-medium
+      {% if vendor.vendor_status == 'active' %}bg-green-50 text-green-700
+      {% elif vendor.vendor_status == 'under_review' %}bg-amber-50 text-amber-700
+      {% else %}bg-gray-100 text-gray-500{% endif %}">
+      {{ vendor.get_vendor_tier_display }}
+    </span>
+  </div>
+  <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-4 text-sm">
+    <div>
+      <p class="text-gray-400 text-xs">Stake deposited</p>
+      <p class="font-medium text-gray-900">${{ vendor.stake_amount_cents|divisibleby:100 }}</p>
+    </div>
+    <div>
+      <p class="text-gray-400 text-xs">Stake status</p>
+      <p class="font-medium text-green-600">Active &amp; locked</p>
+    </div>
+  </div>
+</div>
+
+<!-- Events list -->
+<h2 class="text-sm font-medium text-gray-700 mb-3">Your events</h2>
+
+{% if events %}
+<div class="space-y-3 max-w-2xl">
+  {% for event in events %}
+  <div class="bg-white rounded-xl border border-gray-200 p-5">
+    <div class="flex items-start justify-between">
+      <div>
+        <div class="font-medium text-gray-900">{{ event.title }}</div>
+        <div class="text-sm text-gray-500 mt-0.5">
+          {{ event.kickoff|date:"D j M Y, g:i A" }} · {{ event.venue }}
+        </div>
+        <div class="text-xs text-gray-400 mt-1">
+          {{ event.tickets_sold }} / {{ event.total_capacity }} tickets sold
+          ({{ event.sell_through_pct }}%)
+        </div>
+      </div>
+      <span class="text-xs px-2.5 py-1 rounded-full font-medium
+        {% if event.status == 'active' %}bg-green-50 text-green-700
+        {% elif event.status == 'under_review' %}bg-amber-50 text-amber-700
+        {% elif event.status == 'completed' %}bg-blue-50 text-blue-700
+        {% elif event.status == 'cancelled' %}bg-red-50 text-red-600
+        {% else %}bg-gray-100 text-gray-500{% endif %}">
+        {{ event.get_status_display }}
+      </span>
+    </div>
+
+    <!-- Event actions -->
+    {% if event.status == 'active' %}
+    <div class="mt-4 flex gap-2">
+      <a href="{% url 'events:event_detail' event.id %}"
+         class="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:border-gray-400 transition">
+        View
+      </a>
+      <form method="post" action="{% url 'events:cancel_event' event.id %}"
+            hx-post="{% url 'events:cancel_event' event.id %}"
+            hx-confirm="Cancel this event? A 15% stake penalty will apply.">
+        {% csrf_token %}
+        <input type="hidden" name="reason" value="Vendor cancelled">
+        <button type="submit"
+                class="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-red-500
+                       hover:border-red-200 hover:bg-red-50 transition">
+          Cancel event
+        </button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-12 text-gray-400">
+  <p class="text-sm">No events yet.</p>
+  <a href="{% url 'events:create_event' %}" class="text-brand text-sm mt-2 inline-block hover:underline">
+    Create your first event →
+  </a>
+</div>
+{% endif %}
+{% endblock %}
