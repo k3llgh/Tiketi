@@ -48,7 +48,7 @@ abstract contract Ownable {
         emit OwnershipTransferred(oldOwner, _owner);
     }
 
-    function renounceOwnership() external onlyOwner {
+    function renounceOwnership() external virtual onlyOwner {
         _owner = address(0);
         emit OwnershipTransferred(_owner, address(0));
     }
