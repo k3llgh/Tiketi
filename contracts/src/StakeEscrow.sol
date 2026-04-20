@@ -246,6 +246,10 @@ contract StakeEscrow is ReentrancyGuard, Ownable {
         return vendors[vendor].status == VendorStatus.ACTIVE;
     }
 
+    function renounceOwnership() external pure override {
+    revert("renounceOwnership disabled");
+    }
+
     function unlockTimestamp(address vendor) external view returns (uint256) {
         VendorState storage v = vendors[vendor];
         if (v.exitRequestedAt == 0) return 0;
