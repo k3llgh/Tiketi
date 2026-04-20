@@ -311,4 +311,7 @@ contract BuybackPool is ReentrancyGuard, Ownable {
     function poolBalance() external view returns (uint256) {
         return usdc.balanceOf(address(this));
     }
+    function renounceOwnership() external pure override {
+    revert("renounceOwnership disabled");
+    }
 }
