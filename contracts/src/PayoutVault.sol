@@ -335,6 +335,10 @@ contract PayoutVault is ReentrancyGuard, Ownable {
         return events[eventId].kickoff + PAYOUT_DELAY;
     }
 
+    function renounceOwnership() external pure override {
+    revert("renounceOwnership disabled");
+    }
+
     function setTreasury(address _treasury) external onlyOwner {
         if (_treasury == address(0)) revert ZeroAddress();
         treasury = _treasury;
