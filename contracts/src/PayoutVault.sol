@@ -104,6 +104,7 @@ contract PayoutVault is ReentrancyGuard, Ownable {
      */
     function setBuybackPool(address _pool) external onlyOwner {
         if (_pool == address(0)) revert ZeroAddress();
+        if (buybackPool != address(0)) revert BuybackPoolAlreadySet();
         buybackPool = _pool;
         emit BuybackPoolUpdated(_pool);
     }
