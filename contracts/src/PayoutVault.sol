@@ -226,6 +226,7 @@ contract PayoutVault is ReentrancyGuard, Ownable {
         if (buybackPool == address(0)) revert BuybackPoolNotSet();
 
         TicketDeposit storage t = tickets[ticketId];
+        if (t.eventId != eventId) revert TicketEventMismatch();
         if (t.amount == 0) revert NoDepositFound();
         if (t.returned) revert TicketAlreadyReturned();
         if (t.refunded) revert TicketAlreadyRefunded();
