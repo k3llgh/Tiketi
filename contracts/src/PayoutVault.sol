@@ -51,7 +51,8 @@ contract PayoutVault is ReentrancyGuard, Ownable {
 
     struct TicketDeposit {
         uint256 amount;       // USDC deposited for this ticket
-        address fan;          // Fan who paid
+        address fan; // Fan who paid
+        bytes32 eventId;
         bool    returned;     // True after markReturned()
         bool    refunded;     // True after claimRefund() or refundOne()
     }
@@ -153,9 +154,15 @@ contract PayoutVault is ReentrancyGuard, Ownable {
 
         uint256 amount = t.amount;
         address fan    = t.fan;
+        bytes32 eventId = t.eventId;
 
         // Reduce vendor claimable by this amount
         // (eventId not stored on ticket — amount deducted from total via accounting)
+        EventConfig storage e = events[eventId];
+        if (e.kickoff != 0) {
+            if (e.vendorClaimable >= amount) e.vendorClaimable -= amount;
+            else e.vendorClaimable = 0;
+        }
         t.refunded = true;
 
         usdc.transfer(fan, amount);
@@ -194,6 +201,7 @@ contract PayoutVault is ReentrancyGuard, Ownable {
 
         t.amount = amount;
         t.fan    = fan;
+        t.eventId = eventId;
 
         e.vendorClaimable += amount;
         e.totalDeposited  += amount;
